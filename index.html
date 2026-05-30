@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interstellar Scream</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<canvas id="starfield"></canvas>
+<canvas id="kineticCanvas"></canvas>
+<div id="cur"></div>
+<div id="cur-ring"></div>
+
+<nav>
+  <a href="#" class="logo">IS✦︎</a>
+  <div class="nav-r">
+    <a href="#about" class="nav-a">Studio</a>
+    <a href="#work" class="nav-a">Work</a>
+    <a href="#contact" class="nav-a">Contact</a>
+    <div class="sig-badge"><div class="sig-dot"></div>SIGNAL ACTIVE</div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="scene-wrap" id="hero-wrap">
+<section id="hero">
+  <canvas id="mainCanvas"></canvas>
+
+  <div class="hud hud-tl">
+    <div class="hud-label">Cursor Distance</div>
+    <div class="hud-val" id="h-lat">— —</div>
+    <div class="hud-label">Cursor Angle</div>
+    <div class="hud-val" id="h-lon">— —</div>
+    <div class="hud-sep"></div>
+    <div class="hud-label">Disc Density</div>
+    <div class="hud-val" id="h-sig">░░░░░░░░ 0.0%</div>
+  </div>
+
+  <div class="hud hud-tr">
+    <div class="hud-label">Avg Velocity</div>
+    <div class="hud-val" id="h-freq">0.00 px/f</div>
+    <div class="hud-sep hud-sep-r"></div>
+    <div class="hud-label">Event Horizon</div>
+    <div class="hud-val" id="h-ent">STABLE</div>
+  </div>
+
+  <div class="hud hud-bl">
+    <div class="hud-label">Frame</div>
+    <div class="hud-val" id="h-frame">000000</div>
+    <div class="hud-sep"></div>
+    <div class="hud-label">Particles</div>
+    <div class="hud-val" id="h-pcount">35k</div>
+  </div>
+
+  <div class="hud hud-br">
+    <div class="hud-label">Mean Orbit</div>
+    <div class="hud-val" id="h-amp">0 px</div>
+    <div class="hud-label" style="margin-top:.4rem">Cursor Pull</div>
+    <div class="hud-val" id="h-pull">IDLE</div>
+  </div>
+
+  <!-- <div class="xhair">
+    <div class="xh xh-h"></div>
+    <div class="xh xh-v"></div>
+    <div class="xh-c"></div>
+    <div class="xh-c2"></div>
+  </div> -->
+
+  <div id="heroPhrase">
+    <div class="hero-kicker">001 - Creative Development</div>
+    <p class="hp-line">Born from the space between code and the impossible. We operate at the edge where design discipline meets unreasonable ambition.</p>
+  </div>
+
+  <div id="heroContent">
+    <div class="hero-text">
+      <h1 class="hero-h1">
+        <span class="h1-line h1-l1"><span class="h1-inner">INTERSTELLAR</span></span>
+        <span class="h1-line h1-l2"><span class="h1-inner">SCREAM</span></span>
+      </h1>
+      <div class="hero-bottom-row">
+        <p class="hero-desc">A transmission reaching across the void. We build digital experiences that shouldn't exist yet.</p>
+        <div class="scroll-cue">
+          <span class="sc-txt">Scroll</span>
+          <div class="sc-line"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+</div>
+
+<!-- TAU CETI E -->
+<div class="scene-wrap">
+<section id="tauceti">
+  <canvas id="taucetiCanvas"></canvas>
+  <div class="tc-text">
+    <div class="tc-kicker">◈ Studio Ethos - IS</div>
+    <h2 class="tc-h">PURE<br>SIGNAL.</h2>
+    <p class="tc-sub">Where design precision meets engineering ambition - building work that earns attention without asking for it.</p>
+  </div>
+</section>
+</div>
+
+<!-- MARQUEE -->
+<div class="mq-wrap">
+  <div class="mq-inner">
+    <span class="mq-item">Web Experiences</span>
+    <span class="mq-item">Motion Design</span>
+    <span class="mq-item">Creative Direction</span>
+    <span class="mq-item">Digital Storytelling</span>
+    <span class="mq-item">Interactive 3D</span>
+    <span class="mq-item">Art Direction</span>
+    <span class="mq-item">Brand Identity</span>
+    <span class="mq-item">WebGL Shaders</span>
+    <span class="mq-item">Web Experiences</span>
+    <span class="mq-item">Motion Design</span>
+    <span class="mq-item">Creative Direction</span>
+    <span class="mq-item">Digital Storytelling</span>
+    <span class="mq-item">Interactive 3D</span>
+    <span class="mq-item">Art Direction</span>
+    <span class="mq-item">Brand Identity</span>
+    <span class="mq-item">WebGL Shaders</span>
+  </div>
+</div>
+
+<!-- ABOUT -->
+<section class="section reveal" id="about">
+  <div class="sec-tag">002 - Studio</div>
+  <div class="about-layout">
+    <div>
+      <h2 class="about-h">We build things that<br><em>feel like nowhere</em><br>else on the web.</h2>
+      <div class="tag-row">
+        <span class="tag">Concept</span>
+        <span class="tag">Design</span>
+        <span class="tag">Development</span>
+        <span class="tag">Motion</span>
+        <span class="tag">3D</span>
+        <span class="tag">Creative Tech</span>
+      </div>
+    </div>
+    <div class="about-body">
+      <p>Interstellar Scream is a creative development studio operating at the edge of design and code. We partner with brands, artists, and teams who are serious about making something unforgettable.</p>
+      <p>Every pixel, every frame, every line of code serves one idea - that the best digital experiences feel like they were pulled from another dimension entirely.</p>
+      <p>Selective with projects. Relentless with execution.</p>
+    </div>
+  </div>
+</section>
+
+<!-- WORK -->
+<section class="section reveal" id="work">
+  <div class="sec-tag">003 - Selected Work</div>
+  <div style="display:flex;justify-content:space-between;align-items:baseline">
+    <h2 style="font-family:'Syne',sans-serif;font-size:1.3rem;font-weight:800">Projects</h2>
+    <span style="font-size:.55rem;letter-spacing:.2em;color:var(--red);font-style:italic;text-transform:uppercase">Incoming</span>
+  </div>
+  <div class="work-grid">
+    <div class="wk-cell">
+      <canvas class="wk-canvas" data-mode="grid"></canvas>
+      <div class="wk-num">01</div>
+      <div class="wk-info">
+        <div class="wk-name">Project Void</div>
+        <div class="wk-status">Transmitting...</div>
+      </div>
+    </div>
+    <div class="wk-cell">
+      <canvas class="wk-canvas" data-mode="ripple"></canvas>
+      <div class="wk-num">02</div>
+      <div class="wk-info">
+        <div class="wk-name">Untitled Flux</div>
+        <div class="wk-status">Brewing</div>
+      </div>
+    </div>
+    <div class="wk-cell">
+      <canvas class="wk-canvas" data-mode="flow"></canvas>
+      <div class="wk-num">03</div>
+      <div class="wk-info">
+        <div class="wk-name">???</div>
+        <div class="wk-status">Unknown Signal</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section class="section reveal" id="contact">
+  <div class="sec-tag">004 - Contact</div>
+  <div class="contact-layout">
+    <div>
+      <div class="contact-big">
+        <span>LET'S</span>
+        <span>MAKE</span>
+        <strong>NOISE.</strong>
+      </div>
+    </div>
+    <div class="c-rows">
+      <div class="c-row">
+        <div class="c-lbl">General</div>
+        <a href="mailto:hello@interstellarscream.com" class="c-val">hello@interstellarscream.com</a>
+      </div>
+      <div class="c-row">
+        <div class="c-lbl">New Business</div>
+        <a href="mailto:work@interstellarscream.com" class="c-val">work@interstellarscream.com</a>
+      </div>
+      <div class="c-row">
+        <div class="c-lbl">Based In</div>
+        <span class="c-val">India. Remote-first.</span>
+      </div>
+      <div class="c-row">
+        <div class="c-lbl">Status</div>
+        <span class="c-val" style="color:var(--signal)">Open for Collaboration</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <span class="f-l"><span style="font-size:1.8em;vertical-align:-.35em">©</span> 2026 Interstellar Scream Studio</span>
+  <span class="f-r">MMXXVI</span>
+</footer>
+
+
+<script src="js/stars.js"></script>    <!-- global starfield background -->
+<script src="js/config.js"></script>    <!-- CONFIG object - edit this to tweak everything -->
+<script src="js/noise.js"></script>     <!-- Perlin noise utility -->
+<script src="js/particles.js"></script> <!-- particle arrays, physics, draw -->
+<script src="js/effects.js"></script>   <!-- warp grid -->
+<script src="js/cursor.js"></script>    <!-- custom cursor + influence field -->
+<script src="js/hud.js"></script>       <!-- telemetry HUD updates -->
+<script src="js/tauceti.js"></script>    <!-- tau ceti e gas-planet WebGL section -->
+<script src="js/kinetic-text.js"></script> <!-- character-scramble kinetic typography -->
+<script src="js/main.js"></script>       <!-- canvas init, hero loop, scroll reveal -->
+<script src="js/rocket.js"></script>     <!-- launchable rocket widget, bottom-right -->
+</body>
+</html>
