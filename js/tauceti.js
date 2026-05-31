@@ -4,7 +4,8 @@
     const sec = document.getElementById('tauceti');
 
     const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
-    if (!gl) { sec.style.display = 'none'; return; }
+    // if (!gl) { sec.style.display = 'none'; return; }
+    if (!gl) {console.warn('[tauceti] WebGL unavailable - keeping static background'); return;}
 
     let W = 1, H = 1;
     function resize() {
@@ -53,7 +54,11 @@
 
     // fragment shader
     const FS = `
+      #ifdef GL_FRAGMENT_PRECISION_HIGH
+      precision highp float;
+      #else
       precision mediump float;
+      #endif
       uniform vec2 u_res;
       uniform float u_time;
       uniform float u_scroll;
@@ -154,12 +159,18 @@
     const s = gl.createShader(type);
     gl.shaderSource(s, src);
     gl.compileShader(s);
+    if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) {
+      console.error('[tauceti] shader compile failed:', gl.getShaderInfoLog(s));
+    }
     return s;
   }
   const prog = gl.createProgram();
   gl.attachShader(prog, compile(gl.VERTEX_SHADER, VS));
   gl.attachShader(prog, compile(gl.FRAGMENT_SHADER, FS));
   gl.linkProgram(prog);
+  if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) {
+    console.error('[tauceti] program link failed:', gl.getProgramInfoLog(prog));
+  }
   gl.useProgram(prog);
 
   // Full screen triangle strip
