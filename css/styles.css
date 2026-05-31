@@ -147,17 +147,6 @@ nav{
   will-change:opacity,transform;
   transition:opacity .55s cubic-bezier(.22, 1, .36, 1), transform .55s cubic-bezier(.22, 1, .36, 1);
 }
-/* mobile */
-@media (max-width:680px){
-    #heroPhrase{
-        top:auto;bottom: 43vh;
-        left:2.5rem; right:2.5rem;
-        max-width: none;
-        transform: translateY(var(--pop, 18px));
-    }
-    #heroContent{padding: 1.6rem;}
-    .hero-h1{font-size:clamp(1.7rem, 8.5vw, 2.8rem);}
-}
 .hp-line{
   font-size:.72rem;line-height:1.85;
   color:rgba(232,226,212,.52);font-style:italic;
@@ -222,6 +211,18 @@ nav{
   font-size:.44rem;letter-spacing:.3em;color:rgba(126,207,179,.3);
   text-transform:uppercase;writing-mode:vertical-lr;
 }
+/* mobile */
+@media (max-width:680px){
+    #heroPhrase{
+        top:auto;bottom: 43vh;
+        left:1.5rem; right:1.5rem;
+        max-width: none;
+        transform: translateY(var(--pop, 18px));
+    }
+    #heroContent{padding: 1.5rem;}
+    .hero-h1{font-size:clamp(1.6rem, 8vw, 2.6rem);}
+}
+
 
 /*  MARQUEE  */
 .mq-wrap{

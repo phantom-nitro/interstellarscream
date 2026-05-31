@@ -181,6 +181,13 @@ function _ktSetup() {
 
   const fs = parseFloat(window.getComputedStyle(_h1El).fontSize);
   _pitch   = Math.max(7, fs * 0.135);
+
+  const widest = Math.max(_LINES[0].length, _LINES[1].length);
+  const lineCols = (widest - 1) * 6 + 5;
+  const leftPad = _h1El.getBoundingClientRect().left;
+  const avail = window.innerWidth - leftPad * 2;
+  if (avail > 0) _pitch = Math.min(_pitch, avail / lineCols);
+
   _dotR    = _pitch * 0.30;
   _lineGap = _pitch * 2.4;
 
