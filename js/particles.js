@@ -170,8 +170,10 @@ function stepParticles(dt) {
   const proxR2 = (Hd * 0.35) * (Hd * 0.35);
   const invProxR2 = 1 / proxR2;
 
+  // cursor attraction tilt
+  // match cursor attraction to the y tilt of the BH
   const cursorWorldX = heroMX * Wd;
-  const cursorWorldY = heroMY * Hd;
+  const cursorWorldY = cy + (heroMY * Hd - cy) / DISC_T;
   const cursorActive = heroMY < 1.0 && heroMX > 0 && heroMX < 1;
   let pulling = 0;
 
