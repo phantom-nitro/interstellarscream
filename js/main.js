@@ -71,7 +71,8 @@ function _updateHero() {
   _issActive = hp >= 0.58;
   if (_heroPhrase) {
     _heroPhrase.style.opacity = _issActive ? '1' : '0';
-    _heroPhrase.style.transform = _issActive ? 'translateY(-50%)': 'translateY(calc(-50% + 18px))';
+    // pop offset lives in a CSS var so the breakpoint owns base positioning
+    _heroPhrase.style.setProperty('--pop', _issActive ? '0px': '18px');
   }
   if (_heroText) {
     _heroText.style.opacity   = _issActive ? '1' : '0';

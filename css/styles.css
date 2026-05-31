@@ -141,11 +141,20 @@ nav{
 #heroPhrase{
   position:absolute;
   top:24%;left:2.5rem;
-  transform:translateY(-50%);
+  transform: translateY(calc(-50% + var(--pop, 18px)));
   max-width:min(40vw,460px);
   z-index:20;opacity:0;pointer-events:none;
   will-change:opacity,transform;
   transition:opacity .55s cubic-bezier(.22, 1, .36, 1), transform .55s cubic-bezier(.22, 1, .36, 1);
+}
+/* mobile */
+@media (max-width:680px){
+    #heroPhrase{
+        top:auto;bottom: 43vh;
+        left:2.5rem; right:2.5rem;
+        max-width: none;
+        transform: translateY(var(--pop, 18px));
+    }
 }
 .hp-line{
   font-size:.72rem;line-height:1.85;
