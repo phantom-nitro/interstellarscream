@@ -316,6 +316,12 @@ nav{
 }
 .c-val:hover{color:var(--signal)}
 
+/* mobile */
+@media (max-width:680px){
+    .contact-layout{grid-template-columns: 1fr; gap: 2.5rem;}
+    .c-val{font-size: .9rem; overflow-wrap: anywhere;}
+}
+
 /*  FOOTER  */
 footer{
   padding:1.4rem 2.5rem;
