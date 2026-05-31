@@ -273,6 +273,10 @@ nav{
 }
 .tag:hover{color:var(--signal);border-color:rgba(126,207,179,.22)}
 
+@media (max-width:680px){
+    .about-layout{grid-template-columns: 1fr; gap:2.5rem;}
+}
+
 /*  WORK  */
 .work-grid{
   display:grid;grid-template-columns:repeat(3,1fr);
