@@ -112,7 +112,7 @@ function _adaptParticles(workMs) {
   for (let i = 0; i < 90; i++) sum += _ftBuf[i];
   const avg = sum / 90;
 
-  if (avg < 8 && _targetN < 100000) {
+  if (avg < 10 && _targetN < 100000) {
     _targetN = Math.min(100000, _targetN + 10000);
     _pTrend = 1;
   } else if (avg > 14 && _targetN > 20000) {

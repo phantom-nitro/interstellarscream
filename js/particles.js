@@ -25,6 +25,10 @@ const ptype = new Uint8Array(MAX_N);  // 0=teal  1=amber  2=dim-white
 let _imgData = null;
 let _pxBuf = null;
 
+// near side index buffer. collected in pass 1 consumed in pass 2
+const _nearBuf = new Uint32Array(MAX_N);
+let _nearCount = 0;
+
 function _ensureBuf() {
   if (!_imgData || _imgData.width !== W || _imgData.height !== H) {
     _imgData = ctx.createImageData(W, H);
@@ -151,6 +155,7 @@ function _stampBH(d, cx, cy, Wd, Hd) {
 function stepParticles(dt) {
   _ensureBuf();
   _pxBuf.fill(0);
+  _nearCount = 0;
 
   const cx = bhX(), cy = bhY();
 
@@ -159,10 +164,14 @@ function stepParticles(dt) {
   const DAMPING= CONFIG.PARTICLE_DAMPING;
   const SING_R = CONFIG.SINGULARITY_R;
   const ABS_R  = SING_R * 0.82;
+  const ABS_R_SQ = ABS_R * ABS_R; //squared to avoid sqrt for absorption check
   const ATT_R = CONFIG.ATTRACTION_R;
   const ATT_R_SQ = ATT_R * ATT_R;
   const CF       = CONFIG.CURSOR_FORCE;
   const DISC_T   = CONFIG.DISC_TILT;
+  // pre multiply
+  const gmDt = GM * dt;
+  const cfDt = CF * dt;
   const DISC_T_SQ  = DISC_T * DISC_T;
   const MARGIN = 80;
   const Wd = W;
@@ -187,16 +196,16 @@ function stepParticles(dt) {
     let x = px[i], y = py[i];
     const dx = cx - x, dy = cy - y;
     const dist2    = dx * dx + dy * dy;
+
+    // squared check avoids sqrt for the rare absorbed particle
+    if (dist2 < ABS_R_SQ) {spawnParticle(i); _consumedAccum++; continue;}
+
     const distToBH = Math.sqrt(dist2) || 0.001;
-
-    if (distToBH < ABS_R) { spawnParticle(i); _consumedAccum++; continue; }
-
-    const invD = 1 / distToBH;
-    const gMag = GM / (dist2 + GSOFT_SQ);
-    pvx[i] += dx * invD * gMag * dt;
-    pvy[i] += dy * invD * gMag * dt;
-    pvx[i] *= DAMPING;
-    pvy[i] *= DAMPING;
+    // combined gravity scale
+    const gravScale = gmDt/ (distToBH * (dist2 + GSOFT_SQ));
+    // Fold DAMPING into the update. only few array write per particle
+    pvx[i] = (pvx[i] + dx * gravScale) * DAMPING;
+    pvy[i] = (pvy[i] + dy * gravScale) * DAMPING;
 
     if (cursorActive) {
       const cdx = cursorWorldX - x, cdy = cursorWorldY - y;
@@ -205,8 +214,8 @@ function stepParticles(dt) {
         const cdist = Math.sqrt(cdist2) || 0.001;
         const falloff = 1 - cdist / ATT_R;
         const invCd = 1 / cdist;
-        pvx[i] += cdx * invCd * falloff * falloff * CF * dt;
-        pvy[i] += cdy * invCd * falloff * falloff * CF * dt;
+        pvx[i] += cdx * invCd * falloff * falloff * cfDt;
+        pvy[i] += cdy * invCd * falloff * falloff * cfDt;
         pulling++;
       }
     }
@@ -218,7 +227,7 @@ function stepParticles(dt) {
       spawnParticle(i); continue;
     }
 
-    if (y >= cy) continue;   // near-side  deferred to Pass 2
+    if (y >= cy) {_nearBuf[_nearCount++] = i; continue;};   // near-side  deferred to Pass 2
 
     const sx = (x + 0.5) | 0;
     const sy = (cy + (y - cy) * DISC_T + 0.5) | 0;
@@ -265,13 +274,12 @@ function stepParticles(dt) {
   //  Stamp BH shadow + halo into buffer 
   _stampBH(d, cx, cy, Wd, Hd);
 
-  //  Pass 2: NEAR-side render (world y >= cy -> in front of BH) 
-  for (let i = 0; i < N; i++) {
-    const y = py[i];
-    if (y < cy) continue;   // far-side already rendered
-
-    const x = px[i];
-    if (x < -MARGIN || x > Wd + MARGIN || y < -MARGIN || y > Hd + MARGIN) continue;
+  //  Pass 2: NEAR-side render iterate only the indices collected in pass 1
+  // skips the O(N) full scan and the redundant world off-screan check
+  // pass 1 already confirmed every entry in _nearBuf is on screen
+  for (let j = 0; j < _nearCount; j++) {
+    const i = _nearBuf[j];
+    const x = px[i], y = py[i];
 
     const sx = (x + 0.5) | 0;
     const sy = (cy + (y - cy) * DISC_T + 0.5) | 0;
