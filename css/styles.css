@@ -61,13 +61,13 @@ nav{
 }
 .nav-r{display:flex;align-items:center;gap:2rem}
 .nav-a{
-  font-size:.55rem;letter-spacing:.22em;text-transform:uppercase;
-  color:#888;text-decoration:none;transition:color .3s;
+  font-size:.75rem;letter-spacing:.22em;text-transform:uppercase;
+  color:#0a0a0a;text-decoration:none;transition:color .3s;
 }
-.nav-a:hover{color:#0a0a0a}
+.nav-a:hover{color:#888}
 .sig-badge{
   display:flex;align-items:center;gap:.4rem;
-  font-size:.5rem;letter-spacing:.18em;color:#3aab87;
+  font-size:.75rem;letter-spacing:.18em;color:#3aab87;
 }
 .sig-dot{
   width:5px;height:5px;border-radius:50%;background:#3aab87;
