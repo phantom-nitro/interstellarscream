@@ -175,19 +175,38 @@ init();
   const inner = document.querySelector('.mq-inner');
   if (!inner) return;
 
-  let x = 0, halfW = 0;
+  let x = 0, loopW = 0;
 
-  function measure() { halfW = inner.scrollWidth / 2; }
+
+
+  function setup() {
+    inner.querySelectorAll('[data-mq-clone]').forEach(el => el.remove());
+
+    const origItems = Array.from(inner.children);
+    loopW = origItems.reduce((sum, el) => sum + el.offsetWidth, 0);
+    if (!loopW) return;
+
+    const copies = Math.ceil((window.innerWidth * 3) / loopW);
+    for (let i = 0; i < copies; i++){
+      origItems.forEach(item => {
+        const clone = item.cloneNode(true);
+        clone.dataset.mqClone = '1';
+        inner.appendChild(clone);
+      });
+    }
+
+    if (loopW) x = -((-x) % loopW);
+  }
 
   function tickMq() {
     x -= 0.55;
-    if (halfW && x <= -halfW) x += halfW;
+    if (loopW && x <= -loopW) x += loopW;
     inner.style.transform = `translateX(${x}px)`;
     requestAnimationFrame(tickMq);
   }
 
-  document.fonts.ready.then(() => { measure(); tickMq(); });
-  window.addEventListener('resize', measure);
+  document.fonts.ready.then(() => { setup(); tickMq(); });
+  window.addEventListener('resize', setup);
 }());
 
 //  Scroll reveal 

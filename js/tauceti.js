@@ -94,7 +94,7 @@
         float mInfl = exp(-dot(mDiff, mDiff) * 8.0) * u_mouse_str;
 
         // stretched coord with cursor swirl baked in before domain warp
-        vec2 p = vec2(uv.x * 4.5 + t * 0.12, uv.y * 2.2);
+        vec2 p = vec2(uv.x * 4.5 + t * 0.18, uv.y * 2.2);
 
         // rotate the local patch of p near the cursor (clouds stir)
         float swAng = mInfl * 0.9 * sin(t * 1.9);
@@ -102,13 +102,13 @@
 
         // domain warp q
         vec2 q = vec2(
-          fbm(p + vec2(0.00, t * 0.80)),
-          fbm(p + vec2(5.20, 1.3 + t * 0.60))
+          fbm(p + vec2(t * 0.80, 0.00)),
+          fbm(p + vec2(5.20 + t * 0.60, 1.3))
         );
         // domain warp r
         vec2 r = vec2(
-          fbm(p + 4.0 * q + vec2(1.7, 9.2 + t * 0.40)),
-          fbm(p + 4.0 * q + vec2(8.3, 2.8 + t * 0.50))
+          fbm(p + 4.0 * q + vec2(1.7 + t * 0.40, 9.2)),
+          fbm(p + 4.0 * q + vec2(8.3 + t * 0.50, 2.8))
         );
 
         float f = fbm(p + 3.5 * r);
@@ -134,10 +134,10 @@
         else col = mix(c4, c5, (v-0.88) / 0.12);
 
         // aurora wisps
-        vec2 ap1 = vec2(uv.x * 2.8 - t * 0.24, uv.y * 3.4 + t * 0.34);
+        vec2 ap1 = vec2(uv.x * 2.8 - t * 0.24, uv.y * 3.4);
         float au1 = pow(clamp((fbm(ap1 + q * 0.72 + r * 0.38) - 0.53) / 0.47, 0.0, 1.0), 2.0) * 1.9;
 
-        vec2 ap2 = vec2(uv.x * 3.5 + t * 0.18, uv.y * 2.6 - t * 0.28);
+        vec2 ap2 = vec2(uv.x * 3.5 + t * 0.18, uv.y * 2.6);
         float au2 = pow(clamp((fbm(ap2 + r * 0.55) - 0.56) / 0.44, 0.0, 1.0), 2.5) * 1.5;
 
         float aurora = clamp(au1 + au2 * 0.6, 0.0 , 1.0);

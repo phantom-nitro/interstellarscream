@@ -10,50 +10,57 @@
     cv.style.cssText = 'position:fixed;inset:0;pointer-events:none;z-index:10000';
     document.body.appendChild(cv);
 
-    const c = cv.getContext('2d', {desynchronized: true});
-    let W, H;
-    const resize = () =>{W = cv.width = window.innerWidth; H = cv.height = window.innerHeight;};
+    const c = cv.getContext('2d');
+    let W, H, DPR = 1;
+    const resize = () =>{
+        W = window.innerWidth; H = window.innerHeight;
+        DPR = window.devicePixelRatio || 1;
+        cv.width = W * DPR; cv.height = H * DPR;
+        cv.style.width = W + 'px'; cv.style.height = H + 'px';
+    };
     window.addEventListener('resize', resize);
     resize();
+
+    const _S = Math.max(1, Math.hypot(W,H) / Math.hypot(1920, 1080));
 
     let mx = W/2, my = H/2;
     let px = mx, py = my, ppx = px, ppy = py;
     let rspd = 0;
     document.addEventListener('mousemove', e => {mx = e.clientX; my = e.clientY;});
 
-    const RING_R = 21;
-    const RH = 9;
-    const RW = 3.5;
+    const RING_R = 27;
+    const RH = 12;
+    const RW = 4.5;
     const NOZZLE = RH * 0.5;
     const LAND_R = RING_R + NOZZLE + 1;
     const TAU = Math.PI * 2;
 
-    const DIRTY_PAD  = 20;
+    const DIRTY_PAD  = 45;
 
-    const G_K = 3.0;
-    const G_SOFT = 27;
-    const G_MAX = 0.08;
+    const G_K = 3.0 * _S;
+    const G_SOFT = 27 * _S;
+    const G_MAX = 0.08 * _S;
     const DRAG = 0.989;
-    const MAX_V = 1.7;
+    const MAX_V = 1.7 * _S;
     const MAX_V_LAND = 0.60;
     const RETRO = 0.038;
-    const APPROACH_R = 82;
-    const DETACH_SPD = 2.8;
+    const APPROACH_R = 82 * _S;
+    const DETACH_SPD = 2.8 * _S;
 
-    const BH_K = 3.5;
-    const BH_SOFT = 50;
+    const BH_K = 3.5 * _S;
+    const BH_SOFT = 50 * _S;
 
     const BH_FADE_IN = 120;
 
     const ESCAPE_R = 78;
-    const ESCAPE_K = 30.0;
-    const ESCAPE_EXIT = 300;
+    const ESCAPE_K = 30.0 * _S;
+    const ESCAPE_EXIT = 300 * _S;
     const SLING_TANG = 0.11;
     const SLING_RAD = 0.28;
     const EXIT_TOL = 0.65;
 
     const ORBIT_R = 90;
-    const ORBIT_TARGET_V = 1.20;
+    const ORBIT_TARGET_V = 1.20 * _S;
     const ORBIT_SPRING_K = 0.006;
     const ORBIT_TANG_GAIN = 0.12;
 
@@ -77,6 +84,7 @@
     let landA = 0;
     let perchAge = 0;
     let cooldown = 0;
+    let flameSmooth = 3.5;
 
     const noseToward = (nx, ny) => Math.atan2(nx, -ny);
     const engineToward = (nx, ny) => Math.atan2(-nx, ny);
@@ -92,7 +100,7 @@
         return { tx: -bny * BH_ORBIT_CW, ty: bnx * BH_ORBIT_CW};
     }
 
-    function draw(flameA, struggling) {
+    function draw(flameA, struggling, flen) {
         c.save();
         c.translate(rx, ry);
         c.rotate(ang);
@@ -103,21 +111,20 @@
         c.lineTo(-RW, NOZZLE);
         c.closePath();
         c.strokeStyle = COL_BODY;
-        c.lineWidth = 0.85;
+        c.lineWidth = 1.2;
         c.lineJoin = 'round';
         c.stroke();
 
 
         c.beginPath();
-        c.moveTo(-RW, NOZZLE); c.lineTo(-RW - 2.5, NOZZLE + 3.5);
-        c.moveTo(RW, NOZZLE); c.lineTo(RW + 2.5, NOZZLE + 3.5);
+        c.moveTo(-RW, NOZZLE); c.lineTo(-RW - 3.2, NOZZLE + 4.5);
+        c.moveTo(RW, NOZZLE); c.lineTo(RW + 3.2, NOZZLE + 4.5);
         c.strokeStyle = COL_FIN;
-        c.lineWidth = 0.75;
+        c.lineWidth = 1.0;
         c.stroke();
 
         if (flameA > 0.02) {
             const fa = flameA < 1 ? flameA : 1;
-            const flen = (4 + Math.random() * 3.5) * fa;
             const hot = fa > 0.5;
 
             c.globalCompositeOperation = 'lighter';
@@ -159,7 +166,7 @@
 
     function tick(ts) {
         requestAnimationFrame(tick);
-        const dt = Math.min((ts - pt) / 16.667, 2.0);
+        const dt = Math.min((ts - pt) / 16.667, 1.0);
         pt = ts;
 
         const prx = rx, pry = ry;
@@ -175,7 +182,6 @@
         const nx = ddx / dist, ny = ddy / dist;
 
         if (cooldown > 0) cooldown -= dt;
-
         const drag = 1 - (1 - DRAG) * dt;
         
         // bh influence
@@ -263,10 +269,15 @@
 
             vx *= drag; vy *= drag;
             const spd = Math.sqrt(vx * vx + vy * vy);
-            if (spd > MAX_V * 1.5) {const inv = MAX_V * 1.5 / spd; vx *= inv; vy *= inv;}
+            if (spd > MAX_V * 2.5) {const inv = MAX_V * 2.5 / spd; vx *= inv; vy *= inv;}
             rx += vx * dt; ry += vy * dt;
 
-            if (bhDist > ESCAPE_EXIT) { phase = 'free'; cooldown = 20;}
+            if (bhDist > ESCAPE_EXIT) { 
+                const dotVC = vx * nx + vy * ny;
+                if (dotVC > 0 || bhDist > ESCAPE_EXIT * 1.8) {
+                    phase = 'free'; cooldown = 20;
+                }
+            }
         
             // orbit
         } else if (phase === 'orbit') {
@@ -296,8 +307,8 @@
             // perch
         } else if (phase === 'perch') {
             perchAge += dt;
-            rx = px + Math.cos(landA) * LAND_R;
-            ry = py + Math.sin(landA) * LAND_R;
+            rx = mx + Math.cos(landA) * LAND_R;
+            ry = my + Math.sin(landA) * LAND_R;
             ang = engineToward(-Math.cos(landA), -Math.sin(landA));
             flameA = 0.20 + Math.random() * 0.10;
 
@@ -314,22 +325,24 @@
         } else if (phase === 'approach') {
             const spd = Math.sqrt(vx * vx + vy * vy);
             if (spd > 0.12) {
-                const inv = 1/spd;
-                vx -= vx * inv * RETRO * dt;
-                vy -= vy * inv * RETRO * dt;
+                vx -= (vx / spd)* RETRO * dt;
+                vy -= (vy / spd) * RETRO * dt;
             }
 
             const ga = Math.min (G_K / (dist > G_SOFT ? dist : G_SOFT), G_MAX);
-            vx += (nx * ga + bnx * bhAcc) * dt;
-            vy += (ny * ga + bny * bhAcc) * dt;
+            vx += (nx * ga + bnx * bhAcc * 0.15) * dt;
+            vy += (ny * ga + bny * bhAcc * 0.15) * dt;
             vx *= drag; vy *= drag;
 
             const spd2 = Math.sqrt(vx * vx + vy * vy);
-            if (spd2 > MAX_V_LAND) { const inv = MAX_V_LAND / spd2; vx *= inv; vy *= inv;}
+            if (spd2 > MAX_V_LAND) { 
+                const newSpd = MAX_V_LAND + (spd2 - MAX_V_LAND) * 0.82;
+                vx *= newSpd / spd2; vy *= newSpd / spd2;
+            }
             rx += vx * dt; ry += vy * dt;
 
-            ang = lerpAng(ang, engineToward(nx, ny), 0.10 * dt);
-            if (struggling) ang += (Math.random() - 0.5) * 0.055 * Math.min(bhRatio, 3);
+            ang = lerpAng(ang, engineToward(nx, ny), 0.15 * dt);
+            if (struggling) ang += (Math.random() - 0.5) * 0.03 * Math.min(bhRatio, 3);
             flameA = 0.70 + Math.random() * 0.25;
 
             if (dist <= LAND_R + 0.5) {
@@ -341,26 +354,41 @@
 
             // free
         } else {
-            const ga = Math.min (G_K / (dist > G_SOFT ? dist : G_SOFT), G_MAX);
-            vx += (nx * ga + bnx * bhAcc) * dt;
-            vy += (ny * ga + bny * bhAcc) * dt;
-            vx *= drag; vy *= drag;
+            const curSpd = Math.sqrt(vx * vx + vy * vy);
+            const rawGa = G_K / (dist > G_SOFT ? dist : G_SOFT);
 
-            const spd = Math.sqrt(vx * vx + vy * vy);
-            if (spd > MAX_V) {const inv = MAX_V / spd; vx *= inv; vy *= inv;}
+            const speedRatio = Math.min(1, Math.max(0, (curSpd - MAX_V * 0.1) / (MAX_V * 0.4)));
+            const minGa = G_MAX * 0.8 * speedRatio;
+            const ga = Math.min(Math.max(rawGa, minGa), G_MAX * 2);
+            vx += (nx * ga + bnx * bhAcc * 0.15) * dt;
+            vy += (ny * ga + bny * bhAcc * 0.15) * dt;
+
+            vx *= 0.9985; vy *= 0.9985;
+            let spd = Math.sqrt(vx * vx + vy * vy);
+            if (spd > MAX_V * 1.5) { const inv = MAX_V * 1.5 / spd; vx *= inv; vy *= inv; spd = MAX_V * 1.5;}
+
+            if (dist < APPROACH_R * 2 && cooldown <= 0 && spd > MAX_V_LAND) {
+                const t = 1-dist/ (APPROACH_R * 2);
+                vx *= 1-t * 0.04;
+                vy *= 1-t * 0.04;
+            }
             rx += vx * dt; ry += vy * dt;
 
-            if (spd > 0.06) ang = lerpAng(ang, noseToward(vx, vy), 0.08 * dt);
-            if (dist < APPROACH_R && cooldown <= 0) phase = 'approach';
+            const angRate = Math.min(0.22, 0.06 + (spd / MAX_V) * 0.14);
+            if (spd > 0.06) ang = lerpAng(ang, noseToward(vx, vy), angRate * dt);
+            if (dist < APPROACH_R && cooldown <= 0 ) phase = 'approach';
         }
 
         if (bhRatio > 0.3 && phase !== 'orbit' && phase !== 'escape') {
             flameA = Math.min(flameA + (bhRatio - 0.3) * 0.45, 1.0);
         }
 
+        const rawFlen = (4 + Math.random() * 3.5) * Math.min(flameA, 1);
+        flameSmooth += (rawFlen - flameSmooth) * 0.25;
 
+        c.setTransform(DPR, 0,0,DPR,0,0);
         c.clearRect(prx - DIRTY_PAD, pry - DIRTY_PAD, DIRTY_PAD * 2, DIRTY_PAD * 2);
-        draw(flameA, struggling);
+        draw(flameA, struggling, flameSmooth);
     }
 
 

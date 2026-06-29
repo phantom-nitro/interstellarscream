@@ -132,6 +132,68 @@
         }
     }
 
+    // aurora
+    function drawAurora() {
+        ctx.save();
+        ctx.globalCompositeOperation = 'screen';
+
+        const pulse = 0.50 + 0.50 * Math.sin(T * 0.35);
+
+        const glowH = H * 0.44;
+        const gg = ctx.createLinearGradient(0,0,0,glowH);
+        gg.addColorStop(0, 'rgba(15, 190, 55, 0');
+        gg.addColorStop(0.28, `rgba(15, 190, 55, ${(0.05 * pulse).toFixed(4)})`);
+        gg.addColorStop(0.62, `rgba(15, 190, 55, ${(0.024 * pulse).toFixed(4)})`);
+        gg.addColorStop(1, 'rgba(15, 190, 55, 0');
+
+        ctx.fillStyle = gg;
+        ctx.fillRect(0,0,W,glowH);
+
+        const STRIP = 4;
+        const n = Math.ceil(W/ STRIP);
+        const cYBase = 0.21;
+        const halfHBase = H * 0.19;
+
+        for (let i = 0; i < n; i++) {
+            const xN = i/n;
+            const x = i * STRIP;
+
+            const wave = Math.sin(xN * 3.1 + T * 0.15) * 0.028
+                + Math.sin(xN * 7.2 + T * 0.24 + 1.52) * 0.013
+                + Math.sin(xN * 1.8 + T * 0.08 + 3.10) * 0.021;
+            const cY = (cYBase + wave) * H;
+
+            const hMod = 0.72
+                + 0.20 * Math.sin(xN * 3.4 + T * 0.11)
+                + 0.08 * Math.sin(xN * 7.9 + T * 0.18 + 0.6);
+            const halfH = halfHBase * Math.max(0.15, hMod);
+
+            const fold = 0.62
+                + 0.24 * Math.sin(xN * 2.5 + T * 0.13 + 0.4)
+                + 0.14 * Math.sin(xN * 5.3 + T * 0.19 + 1.8);
+
+            const env = Math.pow(Math.sin(xN * Math.PI), 0.45)
+                * (0.72 + 0.28 * Math.sin(xN * 2.1 + T * 0.04));
+
+            const a = 0.60 * pulse * env * fold;
+            if (a < 0.005) continue;
+
+            const g = ctx.createLinearGradient(x, cY - halfH, x, cY + halfH);
+            g.addColorStop(0, `rgba(70, 15, 200, 0)`);
+            g.addColorStop(0.12, `rgba(65, 25, 195, ${(a * 0.08).toFixed(3)})`);
+            g.addColorStop(0.34, `rgba(25, 220, 75, ${(a * 0.45).toFixed(3)})`);
+            g.addColorStop(0.58, `rgba(18, 250, 82, ${(a * 0.90).toFixed(3)})`);
+            g.addColorStop(0.68, `rgba(18, 250, 82, ${(a * 1.00).toFixed(3)})`);
+            g.addColorStop(0.80, `rgba(8, 220, 150, ${(a * 0.40).toFixed(3)})`);
+            g.addColorStop(0.91, `rgba(0, 185, 210, ${(a * 0.10).toFixed(3)})`);
+            g.addColorStop(1, `rgba(0, 165, 200, 0)`);
+
+            ctx.fillStyle = g;
+            ctx.fillRect(x, cY - halfH, STRIP, halfH * 2);
+        }
+        ctx.restore();
+    }
+
     // DRAW LOOP
     let T = 0;
 
@@ -140,6 +202,8 @@
 
         ctx.fillStyle = '#04040a';
         ctx.fillRect(0, 0, W, H);
+
+        drawAurora();
 
         // Stars - multi frequency twinkle
         for (let i = 0; i < N; i++) {

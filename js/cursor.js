@@ -12,13 +12,10 @@ document.addEventListener("mousemove", (e) => {
     curEl.style.top = mouseY + "px";
 });
 
-(function animRing() {
-    ringX += (mouseX - ringX) * 0.1;
-    ringY += (mouseY - ringY) * 0.1;
-    ringEl.style.left = ringX + "px";
-    ringEl.style.top = ringY + "px";
-    requestAnimationFrame(animRing);
-})();
+document.addEventListener('mousemove', e => {
+    ringEl.style.left = e.clientX + 'px';
+    ringEl.style.top = e.clientY + 'px';
+});
 
 function drawCursorField() {
     if (heroMY >= 1.0) return;
