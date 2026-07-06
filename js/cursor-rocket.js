@@ -307,13 +307,13 @@
             // perch
         } else if (phase === 'perch') {
             perchAge += dt;
-            rx = mx + Math.cos(landA) * LAND_R;
-            ry = my + Math.sin(landA) * LAND_R;
+            rx = px + Math.cos(landA) * LAND_R;
+            ry = py + Math.sin(landA) * LAND_R;
             ang = engineToward(-Math.cos(landA), -Math.sin(landA));
             flameA = 0.20 + Math.random() * 0.10;
 
             if (perchAge > 0.5 && rspd > DETACH_SPD) {
-                vx = Math.cos(landA) * 1.0; vy = Math.sin(landA) * 1.0;
+                vx = 0; vy = 0;
                 cooldown = 35; phase = 'free';
             }
             if (bhAcc > G_MAX * 0.90) {
