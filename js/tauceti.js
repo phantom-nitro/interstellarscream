@@ -25,6 +25,7 @@
     }
     window.addEventListener('scroll', refreshScroll, {passive: true});
 
+    
     // cursor tracking
     //position staus at last known location on leave
     // strength lerps to 0 so the swirl dissolves gracefully instead of cutting off
